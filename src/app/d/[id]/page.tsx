@@ -3,12 +3,14 @@ import { prisma } from '@/lib/db';
 import { notFound, redirect } from 'next/navigation';
 import DocumentEditor from '@/components/DocumentEditor';
 
-export default async function DocumentPage({ params }: { params: { id: string } }) {
+export default async function DocumentPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect('/');
 
+  const { id } = await params;
+
   const doc = await prisma.document.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       owner: true,
       shares: {
